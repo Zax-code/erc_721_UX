@@ -16,6 +16,7 @@ const contractInstance = new web3.eth.Contract(contract, contractAddress);
 const name = ref("");
 const gotContract = ref(false);
 const totalSupply = ref(0);
+const tokenId = ref(0);
 //Function that claims a new token for the user
 const claim = async () => {
   const accounts = await window.ethereum.request({
@@ -26,6 +27,12 @@ const claim = async () => {
     from: account,
   });
   console.log(tx);
+};
+
+//Function to get a token metadata URI
+const getMetadataURI = async (tokenId) => {
+  const uri = await contractInstance.methods.tokenURI(tokenId).call();
+  console.log(uri);
 };
 
 //Get contract name and put it in the name variable
@@ -40,14 +47,19 @@ const getContractInfos = async () => {
   <div>
     <h1>FAKE BAYC</h1>
     <p>Contract Address: {{ contractAddress }}</p>
-    <button @click="getContractInfos">Get Name</button>
+    <button @click="getContractInfos">Get Infos</button>
     <p v-if="gotContract">Name: {{ name }}</p>
     <p v-if="gotContract">Total Supply: {{ totalSupply }}</p>
-    <button @click="claim" id="claim">Claim</button>
+    <button @click="claim">Claim</button>
+    //form to get a token metadata URI
+    <form @submit.prevent="getMetadataURI(tokenId)">
+      <input type="text" v-model="tokenId" />
+      <button type="submit">Get Metadata URI</button>
+    </form>
   </div>
 </template>
 <style scoped>
-#claim {
+button {
   background-color: #4caf50;
   border: none;
   color: white;
