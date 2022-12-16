@@ -10,9 +10,11 @@ if (typeof window.ethereum == "undefined") {
 console.log("MetaMask is installed!");
 const ethereum = window.ethereum;
 const web3 = new Web3(ethereum);
+const deg = ref("148deg");
 const chainId = ref(0);
 const connected = ref(false);
 const lastBlock = ref(0);
+
 //Force metamask to connect to Sepolia network
 
 async function connect() {
@@ -38,7 +40,7 @@ async function connect() {
   <div>
     <h1>Chain Info</h1>
     <div>
-      <button @click="connect" id="connect_button">Connect to MetaMask</button>
+      <button @click="connect">Connect to MetaMask</button>
       <p class="onChain_content" v-if="connected">Chain ID: {{ chainId }}</p>
       <p class="onChain_content" v-if="connected">
         Last Block: {{ lastBlock }}
@@ -54,16 +56,8 @@ div {
   justify-content: center;
   gap: 1rem;
 }
-#connect_button {
-  background-color: #4caf50;
-  border: none;
-  border-radius: 0.5rem;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
+button {
+  background: linear-gradient(148deg, #19335a, #8fc8eb);
 }
 .onChain_content {
   font-size: 1.5rem;

@@ -14,9 +14,19 @@ const router = createRouter({
       component: () => import("../views/ChainInfoView.vue"),
     },
     {
-      path: "/fakeBAYC",
+      path: "/fakeBAYC/:id?",
       name: "fakeBAYC",
       component: () => import("../views/FakeBAYCView.vue"),
+    },
+    {
+      path: "/fakeNefturians",
+      name: "fakeNefturians",
+      component: () => import("../views/FakeNefturiansView.vue"),
+    },
+    {
+      path: "/fakeMeebits",
+      name: "fakeMeebits",
+      component: () => import("../views/FakeMeebitsView.vue"),
     },
     {
       path: "/error/:code",

@@ -3,12 +3,14 @@ import { RouterLink, RouterView } from "vue-router";
 </script>
 
 <template>
-  <div>
+  <div id="root">
     <nav>
       <ul>
         <li><RouterLink to="/">Home</RouterLink></li>
         <li><RouterLink to="/chain-info">Chain Info</RouterLink></li>
         <li><RouterLink to="/fakeBAYC">Fake BAYC</RouterLink></li>
+        <li><RouterLink to="/fakeNefturians">Fake Nefturians</RouterLink></li>
+        <li><RouterLink to="/fakeMeebits">Fake Meebits</RouterLink></li>
       </ul>
     </nav>
     <RouterView />
@@ -16,7 +18,10 @@ import { RouterLink, RouterView } from "vue-router";
 </template>
 
 <style scoped>
-div {
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,11 +51,11 @@ nav a:hover {
 }
 /*Make the nav bar more visible in a dark theme*/
 nav {
-  width: 100vw;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background-color: #333;
+  background-color: #b8bfd6;
 }
 </style>

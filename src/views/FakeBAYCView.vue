@@ -1,23 +1,51 @@
 <script setup>
 //import { useRoute, useRouter } from "vue-router";
-import { ref } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Web3 from "web3";
 import contract from "../contracts/FakeBAYC.json";
+import { useRoute, useRouter } from "vue-router";
+import { getMetadata } from "../scripts/api.js";
 
 const web3 = new Web3(window.ethereum);
+const route = useRoute();
+const router = useRouter();
 
 const contractAddress = "0x1dA89342716B14602664626CD3482b47D5C2005E";
 const contractInstance = new web3.eth.Contract(contract, contractAddress);
 
 //Get contract total supply
 //const totalSupply = ref(0);
+//Function to get a token metadata URI
 
 //Get contract name
 const name = ref("");
 const gotContract = ref(false);
 const totalSupply = ref(0);
-const tokenId = ref(0);
+const tokenId = ref(route.params.id ?? undefined);
+const imageURL = ref("");
 //Function that claims a new token for the user
+onMounted(() => {
+  if (tokenId.value) {
+    getMetadata(tokenId.value, contractInstance).then((res) => {
+      imageURL.value = res.image;
+    });
+  }
+});
+
+watch(
+  () => route.params.id,
+  (newID) => {
+    console.log("watched");
+    console.log(contractInstance);
+    tokenId.value = newID;
+    if (tokenId.value) {
+      getMetadata(tokenId.value, contractInstance).then((res) => {
+        imageURL.value = res.image;
+      });
+    }
+  }
+);
+
 const claim = async () => {
   const accounts = await window.ethereum.request({
     method: "eth_requestAccounts",
@@ -29,12 +57,6 @@ const claim = async () => {
   console.log(tx);
 };
 
-//Function to get a token metadata URI
-const getMetadataURI = async (tokenId) => {
-  const uri = await contractInstance.methods.tokenURI(tokenId).call();
-  console.log(uri);
-};
-
 //Get contract name and put it in the name variable
 const getContractInfos = async () => {
   name.value = await contractInstance.methods.name().call();
@@ -44,31 +66,31 @@ const getContractInfos = async () => {
 };
 </script>
 <template>
-  <div>
+  <div id="container">
     <h1>FAKE BAYC</h1>
     <p>Contract Address: {{ contractAddress }}</p>
     <button @click="getContractInfos">Get Infos</button>
-    <p v-if="gotContract">Name: {{ name }}</p>
-    <p v-if="gotContract">Total Supply: {{ totalSupply }}</p>
+    <div v-if="gotContract">
+      <p>Contract Name: {{ name }}</p>
+      <p>Contract Total Supply: {{ totalSupply }}</p>
+    </div>
     <button @click="claim">Claim</button>
-    //form to get a token metadata URI
-    <form @submit.prevent="getMetadataURI(tokenId)">
+    <form @submit.prevent="router.push({ params: { id: tokenId } })">
       <input type="text" v-model="tokenId" />
-      <button type="submit">Get Metadata URI</button>
+      <button type="submit">Get Metadata</button>
     </form>
+    <img :src="imageURL" v-if="imageURL" />
   </div>
 </template>
 <style scoped>
-button {
-  background-color: #4caf50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+img {
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 </style>
