@@ -43,24 +43,38 @@ const mint = async () => {
   <div id="container">
     <h1>Fake Nefturians</h1>
     <button @click="getOwnedTokens">Get Owned Tokens</button>
-    <button @click="mint">Mint</button>
-    <div class="tokens" v-for="token in tokens" :key="token">
-      <h2>{{ token.name }}</h2>
-      <img :src="token.image" />
-      <p>{{ token.description }}</p>
+    <button id="mint" @click="mint">Mint</button>
+    <div id="ownerTokens">
+      <div class="tokens" v-for="token in tokens" :key="token">
+        <h2>{{ token.name }}</h2>
+        <img :src="token.image" />
+        <p>{{ token.description }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 img {
-  width: 50%;
+  width: 100%;
+}
+#ownerTokens {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
 }
 
+#mint {
+  background: linear-gradient(148deg, #3f7856, #7ec384);
+}
 .tokens {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 40%;
   justify-content: center;
 }
 #container {

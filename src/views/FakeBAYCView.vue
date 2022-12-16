@@ -74,10 +74,10 @@ const getContractInfos = async () => {
       <p>Contract Name: {{ name }}</p>
       <p>Contract Total Supply: {{ totalSupply }}</p>
     </div>
-    <button @click="claim">Claim</button>
+    <button id="claim" @click="claim">Claim</button>
     <form @submit.prevent="router.push({ params: { id: tokenId } })">
-      <input type="text" v-model="tokenId" />
-      <button type="submit">Get Metadata</button>
+      <input type="number" v-model="tokenId" />
+      <button type="submit" id="getMetadata">Get Metadata</button>
     </form>
     <img :src="imageURL" v-if="imageURL" />
   </div>
@@ -87,6 +87,24 @@ const getContractInfos = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+form {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+input {
+  padding: 5px;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+}
+#claim {
+  background: linear-gradient(148deg, #3f7856, #7ec384);
+}
+#getMetadata {
+  background: linear-gradient(148deg, #ffb284, #aeaeb0);
 }
 img {
   width: 100%;

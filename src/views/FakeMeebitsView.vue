@@ -59,13 +59,15 @@ const getOwnersTokens = async () => {
     <h1>Fake Meebit</h1>
     <form @submit.prevent="mint">
       <input type="number" v-model="tokenId" />
-      <button type="submit">Mint</button>
+      <button id="mint" type="submit">Mint</button>
     </form>
     <button @click="getOwnersTokens">Get Owners Tokens</button>
-    <div class="NFTs" v-for="token in ownersTokens" :key="token">
-      <h2>{{ token.name }}</h2>
-      <img :src="token.image" />
-      <p>{{ token.description }}</p>
+    <div id="ownerTokens">
+      <div class="tokens" v-for="token in ownersTokens" :key="token">
+        <h2>{{ token.name }}</h2>
+        <img :src="token.image" />
+        <p>{{ token.description }}</p>
+      </div>
     </div>
   </div>
   <div v-else>
@@ -75,10 +77,39 @@ const getOwnersTokens = async () => {
 </template>
 
 <style scoped>
-.NFTs {
+form {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+input {
+  padding: 5px;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+}
+img {
+  width: 100%;
+}
+#ownerTokens {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+#mint {
+  background: linear-gradient(148deg, #3f7856, #7ec384);
+}
+.tokens {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 40%;
+  justify-content: center;
 }
 #container {
   display: flex;
