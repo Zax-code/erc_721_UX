@@ -11,7 +11,7 @@ body {
   padding: 0;
   width: 100%;
   /*Dark themed background*/
-  background-color: #697a98;
+  background-color: #2e3440;
   /*Beautiful grey text*/
   color: #d9d5d4;
 }
@@ -26,7 +26,7 @@ button {
   border: none;
   background-color: #19335a;
   background: linear-gradient(148deg, #19335a, #8fc8eb);
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
   color: white;
   padding: 15px 32px;
   text-align: center;
@@ -43,4 +43,94 @@ button:hover {
   flex-direction: column;
   align-items: center;
   height: 100vh;
+}
+.onChain_content {
+  font-size: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.onChain_content p {
+  margin: 0;
+}
+
+/*Loading animation*/
+.loadingContainer {
+  display: flex;
+  aspect-ratio: 1 / 1;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.loader {
+  margin-top: 5rem;
+  width: 60px;
+  height: 50px;
+  text-align: center;
+  font-size: 10px;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateY(-50%) translateX(-50%);
+}
+.loader > div {
+  height: 100%;
+  width: 8px;
+  display: inline-block;
+  float: left;
+  margin-left: 2px;
+  -webkit-animation: delay 0.8s infinite ease-in-out;
+  animation: delay 0.8s infinite ease-in-out;
+}
+.loader .bar1 {
+  background-color: #754fa0;
+}
+.loader .bar2 {
+  background-color: #09b7bf;
+  -webkit-animation-delay: -0.7s;
+  animation-delay: -0.7s;
+}
+.loader .bar3 {
+  background-color: #90d36b;
+  -webkit-animation-delay: -0.6s;
+  animation-delay: -0.6s;
+}
+.loader .bar4 {
+  background-color: #f2d40d;
+  -webkit-animation-delay: -0.5s;
+  animation-delay: -0.5s;
+}
+.loader .bar5 {
+  background-color: #fcb12b;
+  -webkit-animation-delay: -0.4s;
+  animation-delay: -0.4s;
+}
+.loader .bar6 {
+  background-color: #ed1b72;
+  -webkit-animation-delay: -0.3s;
+  animation-delay: -0.3s;
+}
+
+@-webkit-keyframes delay {
+  0%,
+  40%,
+  100% {
+    -webkit-transform: scaleY(0.05);
+  }
+  20% {
+    -webkit-transform: scaleY(1);
+  }
+}
+@keyframes delay {
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.05);
+    -webkit-transform: scaleY(0.05);
+  }
+  20% {
+    transform: scaleY(1);
+    -webkit-transform: scaleY(1);
+  }
 }

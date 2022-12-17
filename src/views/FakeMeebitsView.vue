@@ -1,12 +1,15 @@
 <script setup>
 import { ref } from "vue";
-import Web3 from "web3";
 import tokenContract from "../contracts/FakeMeebits.json";
 import tokenClaimerContract from "../contracts/FakeMeebitsClaimer.json";
 import signatures from "../contracts/FakeMeebitsSignatures.json";
 import { getMetadata } from "../scripts/api.js";
 
-const web3 = new Web3(Web3.givenProvider);
+const props = defineProps({
+  account: String,
+  web3: Object,
+});
+const { account, web3 } = props;
 const tokenAddress = "0xD1d148Be044AEB4948B48A03BeA2874871a26003";
 const tokenClaimerAdress = "0x5341e225Ab4D29B838a813E380c28b0eFD6FBa55";
 const tokenInstance = new web3.eth.Contract(tokenContract, tokenAddress);
@@ -14,55 +17,63 @@ const tokenClaimerInstance = new web3.eth.Contract(
   tokenClaimerContract,
   tokenClaimerAdress
 );
+
 const tokenId = ref();
 const ownersTokens = ref([]);
-const account = ref("");
-const connect = () => {
-  if (window.ethereum)
-    window.ethereum
-      .request({
-        method: "eth_requestAccounts",
-      })
-      .then((accounts) => (account.value = accounts[0]));
-  else console.log("No ethereum provider");
-};
-connect();
+const isLoading = ref(false);
+const mintedToken = ref();
 
 const mint = async () => {
   const signature = signatures[tokenId.value].signature;
   const mintTx = await tokenClaimerInstance.methods
     .claimAToken(tokenId.value, signature)
-    .send({ from: account.value, value: 100000000000000 }); //added a small tip :)
+    .send({ from: account, value: 100000000000000 }); //added a small tip :)
+  const mintedId = mintTx.events.aTokenWasClaimed.returnValues._tokenNumber;
+  mintedToken.value = await getMetadata(mintedId, tokenInstance);
   console.log(mintTx);
 };
 
 const getOwnersTokens = async () => {
+  isLoading.value = true;
+  mintedToken.value = undefined;
   const events = await tokenClaimerInstance.getPastEvents("aTokenWasClaimed", {
     fromBlock: 0,
   });
   const _ownersTokensIds = events
     .filter(
-      (e) =>
-        e.returnValues._tokenClaimer.toLowerCase() ==
-        account.value.toLowerCase()
+      (e) => e.returnValues._tokenClaimer.toLowerCase() == account.toLowerCase()
     )
     .map((e) => e.returnValues._tokenNumber);
   const _ownersTokens = await Promise.all(
     _ownersTokensIds.map((id) => getMetadata(id, tokenInstance))
   );
+  isLoading.value = false;
   ownersTokens.value = _ownersTokens;
 };
 </script>
 
 <template>
-  <div v-if="account" id="container">
+  <div id="container">
     <h1>Fake Meebit</h1>
     <form @submit.prevent="mint">
       <input type="number" v-model="tokenId" />
       <button id="mint" type="submit">Mint</button>
     </form>
+    <div id="mintedToken" v-if="mintedToken">
+      <h2>Minted Token</h2>
+      <img :src="mintedToken.image" />
+      <p>{{ mintedToken.description }}</p>
+    </div>
     <button @click="getOwnersTokens">Get Owners Tokens</button>
-    <div id="ownerTokens">
+    <div v-if="isLoading" class="loader">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+      <div class="bar4"></div>
+      <div class="bar5"></div>
+      <div class="bar6"></div>
+    </div>
+    <div v-if="!isLoading" id="ownerTokens">
       <div class="tokens" v-for="token in ownersTokens" :key="token">
         <h2>{{ token.name }}</h2>
         <img :src="token.image" />
@@ -70,13 +81,18 @@ const getOwnersTokens = async () => {
       </div>
     </div>
   </div>
-  <div v-else>
-    <h1>Please connect your wallet</h1>
-    <button @click="connect">Connect</button>
-  </div>
 </template>
 
 <style scoped>
+#mintedToken {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#mintedToken img {
+  width: 40%;
+}
 form {
   display: flex;
   flex-direction: row;

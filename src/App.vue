@@ -1,9 +1,39 @@
 <script setup>
-import { RouterLink, RouterView } from "vue-router";
+import { useRouter, RouterLink, RouterView } from "vue-router";
+import { ref } from "vue";
+import Web3 from "web3";
+
+const router = useRouter();
+const account = ref("");
+const web3 = ref(undefined);
+const error = ref("");
+
+async function connect() {
+  const ethereum = window.ethereum;
+  if (ethereum) {
+    account.value = await ethereum
+      .request({ method: "eth_requestAccounts" })
+      .then((accounts) => accounts[0])
+      .catch((err) => {
+        error.value = err.message;
+      });
+    await ethereum
+      .request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x" + (11155111).toString(16) }],
+      })
+      .catch((error) => {
+        console.log(error);
+        router.push("/Error/" + error.code);
+      });
+    web3.value = new Web3(window.ethereum);
+  } else error.value = "Please install MetaMask";
+  // Get the chain ID and toggle connected variable
+}
 </script>
 
 <template>
-  <div id="root">
+  <div id="root" v-if="account != '' && web3 != undefined">
     <nav>
       <ul>
         <li><RouterLink to="/">Home</RouterLink></li>
@@ -13,7 +43,11 @@ import { RouterLink, RouterView } from "vue-router";
         <li><RouterLink to="/fakeMeebits">Fake Meebits</RouterLink></li>
       </ul>
     </nav>
-    <RouterView />
+    <RouterView :account="account" :web3="web3" />
+  </div>
+  <div id="root" v-else>
+    <h1>{{ error }}</h1>
+    <button @click="connect">Connect</button>
   </div>
 </template>
 
@@ -56,6 +90,6 @@ nav {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background-color: #b8bfd6;
+  background-color: #292e39;
 }
 </style>

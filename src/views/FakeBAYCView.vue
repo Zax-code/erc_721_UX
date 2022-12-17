@@ -1,14 +1,17 @@
 <script setup>
 //import { useRoute, useRouter } from "vue-router";
 import { ref, onMounted, watch } from "vue";
-import Web3 from "web3";
 import contract from "../contracts/FakeBAYC.json";
 import { useRoute, useRouter } from "vue-router";
 import { getMetadata } from "../scripts/api.js";
 
-const web3 = new Web3(window.ethereum);
 const route = useRoute();
 const router = useRouter();
+const props = defineProps({
+  account: String,
+  web3: Object,
+});
+const { account, web3 } = props;
 
 const contractAddress = "0x1dA89342716B14602664626CD3482b47D5C2005E";
 const contractInstance = new web3.eth.Contract(contract, contractAddress);
@@ -23,6 +26,7 @@ const gotContract = ref(false);
 const totalSupply = ref(0);
 const tokenId = ref(route.params.id ?? undefined);
 const imageURL = ref("");
+const isLoading = ref(false);
 //Function that claims a new token for the user
 onMounted(() => {
   if (tokenId.value) {
@@ -35,11 +39,11 @@ onMounted(() => {
 watch(
   () => route.params.id,
   (newID) => {
-    console.log("watched");
-    console.log(contractInstance);
     tokenId.value = newID;
     if (tokenId.value) {
+      isLoading.value = true;
       getMetadata(tokenId.value, contractInstance).then((res) => {
+        isLoading.value = false;
         imageURL.value = res.image;
       });
     }
@@ -47,10 +51,6 @@ watch(
 );
 
 const claim = async () => {
-  const accounts = await window.ethereum.request({
-    method: "eth_requestAccounts",
-  });
-  const account = accounts[0];
   const tx = await contractInstance.methods.claimAToken().send({
     from: account,
   });
@@ -62,31 +62,60 @@ const getContractInfos = async () => {
   name.value = await contractInstance.methods.name().call();
   totalSupply.value = await contractInstance.methods.totalSupply().call();
   gotContract.value = true;
-  console.log("Done");
 };
 </script>
 <template>
-  <div id="container">
+  <div class="container">
     <h1>FAKE BAYC</h1>
-    <p>Contract Address: {{ contractAddress }}</p>
+    <div class="onChain_content">
+      <h3>Contract Address</h3>
+      <p>{{ contractAddress }}</p>
+    </div>
     <button @click="getContractInfos">Get Infos</button>
-    <div v-if="gotContract">
-      <p>Contract Name: {{ name }}</p>
-      <p>Contract Total Supply: {{ totalSupply }}</p>
+    <div v-if="gotContract" id="Contract">
+      <div class="onChain_content contractInfos">
+        <h3>Contract Name</h3>
+        <p>{{ name }}</p>
+      </div>
+      <div class="onChain_content contractInfos">
+        <h3>Total supply</h3>
+        <p>{{ totalSupply }}</p>
+      </div>
     </div>
     <button id="claim" @click="claim">Claim</button>
     <form @submit.prevent="router.push({ params: { id: tokenId } })">
       <input type="number" v-model="tokenId" />
       <button type="submit" id="getMetadata">Get Metadata</button>
     </form>
-    <img :src="imageURL" v-if="imageURL" />
+    <div class="loader" v-if="isLoading">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+      <div class="bar4"></div>
+      <div class="bar5"></div>
+      <div class="bar6"></div>
+    </div>
+    <img :src="imageURL" v-if="imageURL && !isLoading" />
   </div>
 </template>
+
 <style scoped>
-#container {
+#Contract {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1.5rem;
+}
+.contractInfos {
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 form {
   display: flex;
@@ -108,6 +137,10 @@ input {
 }
 img {
   width: 100%;
+  margin: 0;
+  padding: 0;
+}
+h3 {
   margin: 0;
   padding: 0;
 }

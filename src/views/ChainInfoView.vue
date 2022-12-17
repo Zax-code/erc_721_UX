@@ -1,50 +1,45 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import Web3 from "web3";
 
+//define the account prop that will be passed in from the parent component
+const props = defineProps({
+  account: String,
+  web3: Object,
+});
+const { account, web3 } = props;
 const router = useRouter();
 if (typeof window.ethereum == "undefined") {
   router.push("/Error");
 }
-console.log("MetaMask is installed!");
-const ethereum = window.ethereum;
-const web3 = new Web3(ethereum);
-const deg = ref("148deg");
+
 const chainId = ref(0);
-const connected = ref(false);
 const lastBlock = ref(0);
 
 //Force metamask to connect to Sepolia network
 
-async function connect() {
-  await ethereum
-    .request({ method: "eth_requestAccounts" })
-    .then(() => console.log("Connected to MetaMask"));
-  await ethereum
-    .request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0x" + (11155111).toString(16) }],
-    })
-    .catch((error) => {
-      console.log(error);
-      router.push("/Error/" + error.code);
-    });
+async function getNetworkInfo() {
   // Get the chain ID and toggle connected variable
-  chainId.value = await ethereum.request({ method: "eth_chainId" });
+  chainId.value = await web3.eth.getChainId();
   lastBlock.value = await web3.eth.getBlockNumber();
-  connected.value = true;
 }
 </script>
 <template>
   <div>
     <h1>Chain Info</h1>
     <div>
-      <button @click="connect">Connect to MetaMask</button>
-      <p class="onChain_content" v-if="connected">Chain ID: {{ chainId }}</p>
-      <p class="onChain_content" v-if="connected">
-        Last Block: {{ lastBlock }}
-      </p>
+      <div v-if="lastBlock != 0 && chainId != 0">
+        <div class="onChain_content">
+          <h3>Chain ID</h3>
+          <p>Decimal : {{ chainId }}</p>
+          <p>Hex : {{ chainId.toString(16) }}</p>
+        </div>
+        <div class="onChain_content">
+          <h3>Last Block</h3>
+          <p>{{ lastBlock }}</p>
+        </div>
+      </div>
+      <button v-else @click="getNetworkInfo">Connect to MetaMask</button>
     </div>
   </div>
 </template>
@@ -58,8 +53,5 @@ div {
 }
 button {
   background: linear-gradient(148deg, #19335a, #8fc8eb);
-}
-.onChain_content {
-  font-size: 1.5rem;
 }
 </style>
