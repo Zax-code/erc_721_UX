@@ -15,6 +15,7 @@ const tokens = ref([]);
 const isLoading = ref(false);
 
 const getOwnedTokens = async () => {
+  tokens.value = [];
   isLoading.value = true;
   const balance = await contractInstance.methods.balanceOf(account).call();
   const _tokensPromise = [];
@@ -51,7 +52,7 @@ const mint = async () => {
       <div class="bar5"></div>
       <div class="bar6"></div>
     </div>
-    <div v-if="!isLoading" id="ownerTokens">
+    <div id="ownerTokens">
       <div class="tokens" v-for="token in tokens" :key="token">
         <h2>{{ token.name }}</h2>
         <img :src="token.image" />

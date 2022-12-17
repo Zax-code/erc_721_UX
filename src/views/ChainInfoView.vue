@@ -39,7 +39,7 @@ async function getNetworkInfo() {
           <p>{{ lastBlock }}</p>
         </div>
       </div>
-      <button v-else @click="getNetworkInfo">Connect to MetaMask</button>
+      <button v-else @click="getNetworkInfo">Get chain informations</button>
     </div>
   </div>
 </template>

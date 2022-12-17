@@ -25,14 +25,27 @@ const name = ref("");
 const gotContract = ref(false);
 const totalSupply = ref(0);
 const tokenId = ref(route.params.id ?? undefined);
-const imageURL = ref("");
+const metadata = ref(undefined);
 const isLoading = ref(false);
+const error = ref("");
 //Function that claims a new token for the user
-onMounted(() => {
+const getContractInfos = async () => {
+  name.value = await contractInstance.methods.name().call();
+  totalSupply.value = await contractInstance.methods.totalSupply().call();
+};
+const getApe = async () => {
+  isLoading.value = true;
+  console.log(totalSupply.value, tokenId.value);
+  error.value = "";
+  if (+tokenId.value > +totalSupply.value)
+    error.value = "Token ID does not exist";
+  else metadata.value = await getMetadata(tokenId.value, contractInstance);
+  isLoading.value = false;
+};
+onMounted(async () => {
+  await getContractInfos();
   if (tokenId.value) {
-    getMetadata(tokenId.value, contractInstance).then((res) => {
-      imageURL.value = res.image;
-    });
+    await getApe();
   }
 });
 
@@ -40,13 +53,8 @@ watch(
   () => route.params.id,
   (newID) => {
     tokenId.value = newID;
-    if (tokenId.value) {
-      isLoading.value = true;
-      getMetadata(tokenId.value, contractInstance).then((res) => {
-        isLoading.value = false;
-        imageURL.value = res.image;
-      });
-    }
+    metadata.value = undefined;
+    getApe();
   }
 );
 
@@ -58,11 +66,6 @@ const claim = async () => {
 };
 
 //Get contract name and put it in the name variable
-const getContractInfos = async () => {
-  name.value = await contractInstance.methods.name().call();
-  totalSupply.value = await contractInstance.methods.totalSupply().call();
-  gotContract.value = true;
-};
 </script>
 <template>
   <div class="container">
@@ -71,7 +74,9 @@ const getContractInfos = async () => {
       <h3>Contract Address</h3>
       <p>{{ contractAddress }}</p>
     </div>
-    <button @click="getContractInfos">Get Infos</button>
+    <button @click="gotContract = !gotContract">
+      {{ `${gotContract ? "Hide" : "Show"} contract infos` }}
+    </button>
     <div v-if="gotContract" id="Contract">
       <div class="onChain_content contractInfos">
         <h3>Contract Name</h3>
@@ -95,7 +100,8 @@ const getContractInfos = async () => {
       <div class="bar5"></div>
       <div class="bar6"></div>
     </div>
-    <img :src="imageURL" v-if="imageURL && !isLoading" />
+    <h2 id="error" v-if="error != ''">{{ error }}</h2>
+    <img :src="metadata.image" v-if="metadata" />
   </div>
 </template>
 
