@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter, RouterLink, RouterView } from "vue-router";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import Web3 from "web3";
 
 const ethereum = window.ethereum;
@@ -10,6 +10,8 @@ const chainId = ref("");
 const web3 = ref(undefined);
 const error = ref("You need to connect to Metamask");
 const isLoading = ref(false);
+const path = computed(() => router.currentRoute.value.path);
+console.log(path.value);
 
 const Init = async () => {
   isLoading.value = true;
@@ -72,11 +74,33 @@ async function connect() {
   >
     <nav>
       <ul>
-        <li><RouterLink to="/">Home</RouterLink></li>
-        <li><RouterLink to="/chain-info">Chain Info</RouterLink></li>
-        <li><RouterLink to="/fakeBAYC">Fake BAYC</RouterLink></li>
-        <li><RouterLink to="/fakeNefturians">Fake Nefturians</RouterLink></li>
-        <li><RouterLink to="/fakeMeebits">Fake Meebits</RouterLink></li>
+        <li @click="router.push('/')" :class="path == '/' ? 'selected' : ''">
+          Home
+        </li>
+        <li
+          @click="router.push('/chain-info')"
+          :class="path == '/chain-info' ? 'selected' : ''"
+        >
+          Chain Info
+        </li>
+        <li
+          @click="router.push('/fakeBAYC')"
+          :class="path == '/fakeBAYC' ? 'selected' : ''"
+        >
+          Fake BAYC
+        </li>
+        <li
+          @click="router.push('/fakeNefturians')"
+          :class="path == '/fakeNefturians' ? 'selected' : ''"
+        >
+          Fake Nefturians
+        </li>
+        <li
+          @click="router.push('/fakeMeebits')"
+          :class="path == '/fakeMeebits' ? 'selected' : ''"
+        >
+          Fake Meebits
+        </li>
       </ul>
     </nav>
     <RouterView :account="account" :web3="web3" />
@@ -96,6 +120,11 @@ async function connect() {
 </template>
 
 <style scoped>
+.selected {
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  color: #000;
+}
 h2 {
   text-align: center;
   white-space: pre-wrap;
@@ -127,16 +156,19 @@ nav ul {
   padding: 0;
 }
 nav li {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-}
-nav a {
-  color: #f2f2f2;
   text-decoration: none;
   font-size: 1.2rem;
+  display: inline-block;
+  padding: 1.5rem;
+  margin: 1rem 1rem;
+  color: #f2f2f2;
+  transition: 0.3s;
+  border-radius: 5px;
 }
-nav a:hover {
-  color: #ddd;
+nav li:hover {
+  cursor: pointer;
+  background-color: #f1f1f1;
+  color: #000;
 }
 /*Make the nav bar more visible in a dark theme*/
 nav {
