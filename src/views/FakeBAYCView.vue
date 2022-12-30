@@ -37,7 +37,7 @@ const getApe = async () => {
   isLoading.value = true;
   console.log(totalSupply.value, tokenId.value);
   error.value = "";
-  if (+tokenId.value > +totalSupply.value)
+  if (+tokenId.value >= +totalSupply.value)
     error.value = "Token ID does not exist";
   else metadata.value = await getMetadata(tokenId.value, contractInstance);
   isLoading.value = false;
