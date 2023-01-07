@@ -4,6 +4,8 @@ import { ref, computed } from "vue";
 import Web3 from "web3";
 
 const ethereum = window.ethereum;
+const test = ref("test");
+
 const router = useRouter();
 const account = ref("");
 const chainId = ref("");
